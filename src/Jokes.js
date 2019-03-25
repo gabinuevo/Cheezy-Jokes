@@ -3,6 +3,7 @@ import Joke from './Joke'
 import axios from 'axios'
 
 const BASE_URL = 'https://icanhazdadjoke.com'
+const JOKES_NUM = 10;
 
 class Jokes extends Component {
 
@@ -10,6 +11,7 @@ class Jokes extends Component {
         super(props);
         this.state = {
             jokes: [],
+            loading: true
         }
         this.upvote = this.upvote.bind(this);
         this.downvote = this.downvote.bind(this);
@@ -17,43 +19,41 @@ class Jokes extends Component {
 
     // Function to upvote specific joke. keeps target joke in place.
     upvote(id){
-        this.setState({jokes: this.state.jokes.map((j) => {
-                                            if (id===j.id){
-                                                return {...j, score: j.score + 1}
-                                            } return j 
-                                        })})
+        this.setState({jokes: this.state.jokes
+            .map((j) => id===j.id ? {...j, score: j.score + 1} : j )
+        })
     }
 
     downvote(id){
-        this.setState({jokes: this.state.jokes.map((j) => {
-                                            if (id===j.id){
-                                                return {...j, score: j.score - 1}
-                                            } return j 
-                                        })})
+        this.setState({jokes: this.state.jokes
+            .map((j) => id===j.id ? {...j, score: j.score - 1} : j )
+        })
     }
 
     async componentDidMount() {
-        const jokes = await axios.get(`${BASE_URL}/search?limit=10`,
-                                        {headers: {Accept: 'application/json'}});
+        let jokes=[];
 
-        let jokesData = jokes.data.results.map((j) => {
-            return {id: j.id, text: j.joke, score:0}
-        })
-
-        this.setState({jokes: jokesData});
+        for (let i=0; i < JOKES_NUM; i++ ) {
+            const joke = await axios.get(`${BASE_URL}`,
+                                            {headers: {Accept: 'application/json'}});
+            let jokeData = {id: joke.data.id, text: joke.data.joke, score:0}
+            jokes.push(jokeData);
+        }
+        this.setState({jokes: jokes,loading: false});
     }
 
     render() {
-        let jokes = this.state.jokes.map((j) => <Joke key={j.id} 
-                                                      id={j.id}
-                                                      text={j.text} 
-                                                      score={j.score}
+        let jokes = this.state.jokes.map(({id,score,text}) => <Joke key={id} 
+                                                      id={id}
+                                                      text={text} 
+                                                      score={score}
                                                       triggerUpvote={this.upvote}
                                                       triggerDownvote={this.downvote}/>)
         return(
             <div className='Jokes'>
                 <h1> DAD JOKES </h1>
-                {jokes}
+                {this.state.loading ? <h1>Loading....</h1> : <b>{jokes}</b>}
+                
             </div>
         )
     }

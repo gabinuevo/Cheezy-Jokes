@@ -10,13 +10,16 @@ class Joke extends Component {
     }
 
     triggerUpvote() {
-        
         this.props.triggerUpvote(this.props.id)
     }
 
-
     triggerDownvote() {
         this.props.triggerDownvote(this.props.id)
+    }
+
+    // only render the component that has changed.
+    shouldComponentUpdate(nextProps, nextState) {
+        return this.props.score !== nextProps.score;
     }
 
     render() {
