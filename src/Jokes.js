@@ -30,15 +30,28 @@ class Jokes extends Component {
         })
     }
 
+    async getJoke(){
+       let joke = await axios.get(`${BASE_URL}`,
+        {headers: {Accept: 'application/json'}});
+        return {id: joke.data.id, text: joke.data.joke, score:0}
+    }
+    
+    /** using "seen pattern" to make sure there is no repeat joke
+     * 
+    */
     async componentDidMount() {
         let jokes=[];
+        let jokeIds = new Set(jokes);
 
-        for (let i=0; i < JOKES_NUM; i++ ) {
-            const joke = await axios.get(`${BASE_URL}`,
-                                            {headers: {Accept: 'application/json'}});
-            let jokeData = {id: joke.data.id, text: joke.data.joke, score:0}
-            jokes.push(jokeData);
+        while (jokes.length !== JOKES_NUM) {
+            let joke = await this.getJoke();
+
+            if (!jokeIds.has(joke.id)) {
+                jokes.push(joke);
+                jokeIds.add(joke.id);
+            }
         }
+
         this.setState({jokes: jokes,loading: false});
     }
 
