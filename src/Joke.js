@@ -11,13 +11,12 @@ class Joke extends Component {
 
     triggerUpvote() {
         
-        this.props.tellParentToUpvote(this.props.id)
+        this.props.triggerUpvote(this.props.id)
     }
 
 
     triggerDownvote() {
-        // TODO
-        console.log('IGNORE ME, triggerDownvote')
+        this.props.triggerDownvote(this.props.id)
     }
 
     render() {

@@ -12,16 +12,24 @@ class Jokes extends Component {
             jokes: [],
         }
         this.upvote = this.upvote.bind(this);
+        this.downvote = this.downvote.bind(this);
     }
 
+    // Function to upvote specific joke. keeps target joke in place.
     upvote(id){
-        let targetJoke = this.state.jokes.filter((j) => id===j.id)[0];
-        
-        let remainingJokes = this.state.jokes.filter((j) => id!==j.id);
-        
-        targetJoke = {...targetJoke, score: targetJoke.score+1};
+        this.setState({jokes: this.state.jokes.map((j) => {
+                                            if (id===j.id){
+                                                return {...j, score: j.score + 1}
+                                            } return j 
+                                        })})
+    }
 
-        this.setState({jokes: [targetJoke, ...remainingJokes]});
+    downvote(id){
+        this.setState({jokes: this.state.jokes.map((j) => {
+                                            if (id===j.id){
+                                                return {...j, score: j.score - 1}
+                                            } return j 
+                                        })})
     }
 
     async componentDidMount() {
@@ -40,7 +48,8 @@ class Jokes extends Component {
                                                       id={j.id}
                                                       text={j.text} 
                                                       score={j.score}
-                                                      tellParentToUpvote={this.upvote}/>)
+                                                      triggerUpvote={this.upvote}
+                                                      triggerDownvote={this.downvote}/>)
         return(
             <div className='Jokes'>
                 <h1> DAD JOKES </h1>
